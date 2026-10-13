@@ -1,0 +1,43 @@
+nohup: ignoring input
+
+> gilakomputer-pc@0.1.0 dev
+> next dev
+
+▲ Next.js 16.3.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.11.62:3000
+- Environments: .env
+✓ Ready in 426ms
+✓ Running next.config.ts took 60ms
+
+○ Compiling / ...
+⨯ Error [PrismaClientInitializationError]: 
+Invalid `{imported module ./lib/prisma.ts}["prisma"].product.findMany()` invocation in
+/workspace/.next/dev/server/chunks/ssr/[root-of-the-server]__1ayauj1._.js:56:167
+
+  53 ;
+  54 ;
+  55 async function Home() {
+→ 56     const highlightedProducts = await {imported module ./lib/prisma.ts}["prisma"].product.findMany(
+Can't reach database server at `localhost:3306`
+
+Please make sure your database server is running at `localhost:3306`.
+    at <unknown> (app/page.tsx:13:52)
+    at async Home (app/page.tsx:13:31)
+  11 |
+  12 | export default async function Home() {
+> 13 |   const highlightedProducts = await prisma.product.findMany({ include: { category: true }, orderBy: { stock: 'desc' }, take: 6 })
+     |                                                    ^
+  14 |
+  15 |   return (
+  16 |     <main> {
+  clientVersion: '6.19.3',
+  errorCode: undefined,
+  retryable: undefined,
+  digest: '3736307662'
+}
+ GET / 500 in 7.7s (next.js: 7.1s, application-code: 587ms)
+ GET /checkout 200 in 1117ms (next.js: 943ms, application-code: 174ms)
+ GET /checkout 200 in 50ms (next.js: 8ms, application-code: 43ms)
+ GET /checkout 200 in 45ms (next.js: 7ms, application-code: 38ms)
+[?25h

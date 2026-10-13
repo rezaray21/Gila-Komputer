@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Selaras dengan tabel `user` dan `session` yang sudah ada di database lokal (role default PEMBELI).
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  role         String    @default("PEMBELI") // PEMBELI | ADMIN
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @default(now()) @updatedAt
+  orders       Order[]
+  sessions     Session[]
+
+  @@index([role])
+}
+
+// Sesi login. `id` berisi hash SHA-256 dari token di cookie (bukan token mentah),
+// jadi bocornya isi tabel ini tidak membocorkan sesi yang masih aktif.
+model Session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Brand {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id         Int        @id @default(autoincrement())
+  name       String
+  slug       String     @unique
+  description String    @db.Text // MySQL: pakai TEXT supaya tidak kepotong VARCHAR(191)
+  price      Int
+  stock      Int
+  status     String     @default("ACTIVE")
+  imageUrl   String
+  specs      Json // buat simpan {"CPU": "...", "RAM": "..."}
+  categoryId Int
+  brandId    Int?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now()) @updatedAt
+  category   Category   @relation(fields: [categoryId], references: [id])
+  brand      Brand?     @relation(fields: [brandId], references: [id])
+  inventory  Inventory?
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status])
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  productId Int      @unique
+  quantity  Int      @default(0)
+  reserved  Int      @default(0)
+  updatedAt DateTime @default(now()) @updatedAt
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  orderNumber    String      @unique
+  customerName   String
+  email          String
+  phone          String
+  address        String      @db.Text
+  city           String
+  postalCode     String
+  shippingMethod String
+  shippingFee    Int
+  subtotal       Int
+  total          Int
+  paymentMethod  String?     // kode metode pembayaran, mis. "gopay", "bca"
+  paymentRef     String?     @unique // nomor referensi simulasi pembayaran
+  paidAt         DateTime?   // waktu pembayaran berhasil (simulasi)
+  status         String      @default("PENDING") // PENDING -> PAID -> SHIPPED -> COMPLETED, atau CANCELLED
+  userId         Int?        // null = checkout sebagai tamu
+  payToken       String?     @unique // token acak untuk membayar/membatalkan pesanan tamu
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now()) @updatedAt
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+
+  @@index([email])
+  @@index([status])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  name      String
+  quantity  Int
+  unitPrice Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
