@@ -86,24 +86,112 @@ const additionalProducts = [
   { name: 'Essential USB Mouse', slug: 'essential-usb-mouse', description: 'Mouse sederhana untuk komputer harian', price: 150000, stock: 25, category: 'Mouse', specs: { Sensor: '1600 DPI', Connection: 'USB', Weight: '95g' } },
 ]
 
-//imageUrl placeholder per kategori (file SVG di /public/products)
-const categoryImage = (category: string) => `/products/${category.toLowerCase().replace(/\s+/g, '-')}.svg`
+const selectedAdditionalSlugs = new Set([
+  'rtx-4090-24gb-founders',
+  'rtx-4080-super-16gb',
+  'rtx-4070-ti-super-16gb',
+  'rx-7900-xtx-24gb',
+  'intel-core-i9-14900k',
+  'intel-core-i7-14700',
+  'amd-ryzen-9-7950x',
+  'amd-ryzen-5-5600',
+  'vengeance-64gb-ddr5-6000',
+  'trident-z5-32gb-ddr5-6400',
+  'fury-beast-32gb-ddr4-3200',
+  'nvme-gen4-4tb-creator',
+  'nvme-gen4-1tb-speed',
+  'hdd-4tb-data-vault',
+  'x670e-creator-wifi',
+  'b760m-ddr5-gaming',
+  '1000w-platinum-atx-3',
+  '850w-gold-atx-3',
+  'air-cooler-dual-tower-120',
+  'aio-liquid-cooler-240',
+  'aio-liquid-cooler-360',
+  'mid-tower-airflow-mesh',
+  'panoramic-glass-mid-tower',
+  'mini-itx-creator-case',
+  'pwm-fan-120mm-3-pack',
+  'argb-fan-120mm-3-pack',
+  'monitor-27-1440p-165hz',
+  'monitor-32-4k-creator',
+  'mechanical-keyboard-tkl',
+  'gaming-mouse-26k-dpi',
+])
+const seedProducts = [...productTemplates, ...additionalProducts.filter(({ slug }) => selectedAdditionalSlugs.has(slug))]
+
+const productImages: Record<string, string> = {
+  'rtx-4070-super-12gb': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP06Y09zA-ASH_rHfp3hg_UZn8y5lUOwYeo11STfLOZw&s=10',
+  'radeon-rx-7800-xt-16gb': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCOjqKj69_4DLbaB76Jfu4u304KEd6liay0BiWSWUSTQ&s=10',
+  'rtx-4060-8gb-dual-fan': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9Pk4_ZOP7TjnF5EV465Zim7sZ8-cqeG1mtmdEQ5-61w&s=10',
+  'intel-core-i7-14700k': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTis1CicFcqzuu-cRa_r5QA8PI5Fobx882BdHr1YOGZfg&s=10',
+  'amd-ryzen-7-7800x3d': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaU9vLysK1qVC59rOsZ3b3k_AWUWgMmF8-e5VlsQr0OA&s=10',
+  'amd-ryzen-5-7600': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaIYcItf0tXbpAogckji2tyQZf0RTnZwPWgvmHaES9DA&s=10',
+  'core-i5-12400f': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmT5N-ZOXp-HFQTikW-kPQh8WvoUH8BFfEkEhSvVPx6w&s=10',
+  'vengeance-32gb-ddr5-6000': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqaijOQ6GCM3hwFzmv8dxruVYgS_CgMPYRlu8PfzlyEw&s=10',
+  'fury-beast-16gb-ddr5-5200': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTZuoCZaR3KCDWmOKHxhRQj-04zi2U71jSQTxHpTZ4nw&s=10',
+  'ripjaws-v-32gb-ddr4-3600': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEGsU3pyN-Gg2pN7UKq18Jhdp3yjWGmhRoFlcfDgghUw&s=10',
+  'nvme-gen4-2tb-performance': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeMic2W4rPCrNtVpNvY9Zoi8uZNPoV80MvQB12gST3AA&s=10',
+  'nvme-gen3-1tb-essential': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEnAc0BXjnM_2FRHgp6TTlCO5XB9TMKg2cR0l6DYfTow&s=10',
+  'sata-ssd-1tb-quiet': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5VOYsbRXUTTPwec4z7NSacTwb-xob_2R1jseBG31yzw&s',
+  'b550m-wifi-creator': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY6inBiU-2B3av3Yp8HbPP43_K8Xp7pfeGaMmyYQHR8A&s=10',
+  'b650m-pro-wifi': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTLqi2EzzLGG3POGRq9kJGgqTmX5qZcbRd5OsjF8DqVw&s=10',
+  'z790-ddr5-creator': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJvNNiXM-Sb4gSANWeOVvI8KlXMkxu8M0e76gy-xHYWA&s=10',
+  '650w-gold-modular': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFEFINqxosx8y-F1gTjE0N7WWqBXoAwwqGp3kRcoqXAQ&s',
+  '750w-gold-atx-3': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSs9vkj6S_Pra7pAsvlSIOcuxHz2g39XNxtUE9kuE-ng&s',
+  '850w-platinum-modular': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5MhwmcupFsBGSrv47lymp1bzprjxRLOysgeX3Ad2ILg&s=10',
+  '550w-bronze-quiet': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTN_CwrwlzfY5IMFC5k1w29NASnnZHW41rR--9vr83_DA&s=10',
+  'rtx-4090-24gb-founders': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt3HHYRn0D9-Isx8VcSwyrgQqU8JdopLZv64KQj1lPlw&s=10',
+  'rtx-4080-super-16gb': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN3m4Fdkeg3JVwsjwCScBqNw50UR8M9-7Rl6rmeFH3bQ&s=10',
+  'rtx-4070-ti-super-16gb': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJrlB9oxekYUuwulA40DDauiSKQw1-yY2M1yhhRT3Cjg&s=10',
+  'rx-7900-xtx-24gb': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7OHbG0mPGW88T7iRMpiVfgYlswH6RmW9XqUCLWz_TgQ&s=10',
+  'intel-core-i9-14900k': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyBuxXKjyXgLtYeepyXYr34gM0rUI-8SDBDvzC0cONCQ&s=10',
+  'intel-core-i7-14700': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiGy4069IUmc7cqKdYR_hJIikqhgspKd9x6jO3nxDXCQ&s=10',
+  'amd-ryzen-9-7950x': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAIP1C1BbOrok2taPv0CFOzDvgc0XKDM490tOo-f0aHg&s=10',
+  'amd-ryzen-5-5600': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyB239AWlY_DtsKU3ao5HYk8hcKjN8-qaYYYVO2DuaOw&s',
+  'vengeance-64gb-ddr5-6000': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_NqZjntV34dmXxWrBt2fbG7LsrMz0s7gxsNce9-J9sg&s=10',
+  'trident-z5-32gb-ddr5-6400': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQpWzNlPBB0eBNwKIEZl7zWO4fcp9qoOwPc9C6l2SDfA&s=10',
+  'fury-beast-32gb-ddr4-3200': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5P8Fg_lAncSpu-bJkRpiyPF27o8OxEzPhHNP6F63Wtg&s=10',
+  'nvme-gen4-4tb-creator': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlokIj3cTF8Yv8cjbJSGQBTjKwyFN1VQyrqUfPYO9hVg&s=10',
+  'nvme-gen4-1tb-speed': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYzCBL6CWKc0y48vC4CNubq_ZiCXw2gERvryPZi5JJJg&s=10',
+  'hdd-4tb-data-vault': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlFyHGAR2BcJWbGjEgTgw-1YKwo_vVYqWm37l0IEhCFg&s=10',
+  'x670e-creator-wifi': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnulBdEHJPeUSsA8PimM2VSlm8iC8JQUwScWytw8Ofkg&s=10',
+  'b760m-ddr5-gaming': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLAKOZ4xJPKH4Z_r-bYuYeVWqaM16VCei_n0v6TPvq3g&s=10',
+  '1000w-platinum-atx-3': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmiZlMDl6lLLLTmwhbsFX0cBL-5c5y1E0rZjP27Q3ZJg&s=10',
+  '850w-gold-atx-3': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxz2ust77UbXHHxgMkJpFdv9aA-AtD4GuVPUF0gZOtNQ&s=10',
+  'air-cooler-dual-tower-120': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSml-xZFCzMZtjpCCFAKgI_t0ZvtOnQudmz4Rv-mVsv6g&s',
+  'aio-liquid-cooler-240': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2MDkLspzl1qzb5Rv0iYqgzGkJnMg-hDoSSeW1hVQ9xA&s=10',
+  'aio-liquid-cooler-360': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmSEGpwBuJdj2G1e8K81e1EgfEBlRf0VOJtarVxcrZTQ&s',
+  'mid-tower-airflow-mesh': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_KYMNrdQW3aKLZMOX_gcQ9STR4wxGX99qnUY1stPmsg&s=10',
+  'panoramic-glass-mid-tower': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrY_2vcgXSOANIfhxBp7f-QpoDOA-iK8MnGdOg-vE0eg&s=10',
+  'mini-itx-creator-case': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYKZD15OCmoR6_uxADHxvNekZYgMD-zNpBwry4Z74Nbg&s=10',
+  'pwm-fan-120mm-3-pack': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwo2Fx7bpa-kAiKdgF26HdLkmQ0Unkt7q6ZDX7VS-uaw&s',
+  'argb-fan-120mm-3-pack': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBG5wmSFXHlXrg5xIqHrbF4oemLBSG5nFs01K_E53_PA&s=10',
+  'monitor-27-1440p-165hz': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDZDSMDds9ckIbUWpQqFdOWpT6r0CxXrySVkEDANuCCw&s=10',
+  'monitor-32-4k-creator': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuHsmhWKfYk-qK_sHx3Swau-7DghKksXPpEE8zH3AM4w&s',
+  'mechanical-keyboard-tkl': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwg9chFmgNpG3HyVUUirbMs2fVpsYfvplX4l1kWf2qfg&s=10',
+  'gaming-mouse-26k-dpi': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG0xNnrFC0hWEp6IclRW80Ljb_pK2uMfzQJL4eJbV3rw&s=10',
+}
 
 async function main() {
+  if (seedProducts.length !== 50) throw new Error(`Seeder harus berisi 50 produk, tetapi berisi ${seedProducts.length}.`)
+  const missingImages = seedProducts.filter(({ slug }) => !productImages[slug]).map(({ slug }) => slug)
+  if (missingImages.length) throw new Error(`URL gambar belum tersedia untuk: ${missingImages.join(', ')}.`)
+
   const categories = new Map<string, number>()
   for (const name of ['VGA', 'Processor', 'RAM', 'Storage', 'Motherboard', 'Power', 'CPU Cooler', 'Case', 'Fan', 'Monitor', 'Keyboard', 'Mouse']) {
     const category = await prisma.category.findFirst({ where: { name } }) ?? await prisma.category.create({ data: { name } })
     categories.set(name, category.id)
   }
 
-  await prisma.product.upsert({ where: { slug: 'rtx-4060-ti-16gb' }, update: { imageUrl: categoryImage('VGA') }, create: { name: 'RTX 4060 Ti 16GB', slug: 'rtx-4060-ti-16gb', description: 'Performa 1440p gaming terbaik di kelasnya', price: 7500000, stock: 15, imageUrl: categoryImage('VGA'), specs: { GPU: 'RTX 4060 Ti', VRAM: '16GB GDDR6', TDP: '165W' }, categoryId: categories.get('VGA')! } })
-  await prisma.product.upsert({ where: { slug: 'i5-14600k' }, update: { imageUrl: categoryImage('Processor') }, create: { name: 'Intel Core i5-14600K', slug: 'i5-14600k', description: '14 Core untuk gaming dan editing', price: 5200000, stock: 20, imageUrl: categoryImage('Processor'), specs: { Cores: '14C/20T', Base: '3.5GHz', Socket: 'LGA1700' }, categoryId: categories.get('Processor')! } })
-
-  for (const product of [...productTemplates, ...additionalProducts]) {
+  for (const product of seedProducts) {
     const { category, ...productData } = product
-    const imageUrl = categoryImage(category)
+    const imageUrl = productImages[product.slug]
     await prisma.product.upsert({ where: { slug: product.slug }, update: { ...productData, imageUrl, categoryId: categories.get(category)! }, create: { ...productData, imageUrl, categoryId: categories.get(category)! } })
   }
+  const seededCount = await prisma.product.count({ where: { slug: { in: seedProducts.map(({ slug }) => slug) } } })
+  if (seededCount !== seedProducts.length) throw new Error(`Tabel product berisi ${seededCount} dari ${seedProducts.length} produk contoh.`)
+  console.log(`Tabel product berisi ${seededCount} produk contoh dengan gambar eksternal.`)
 }
 
 main().catch(console.error).finally(() => prisma.$disconnect())

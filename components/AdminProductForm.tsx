@@ -26,9 +26,6 @@ const NEW = '__new__'
 // Id baris spesifikasi hanya dipakai sebagai key React (tidak dirender ke DOM), jadi aman memakai pencacah modul.
 let rowSequence = 0
 const makeRow = (key = '', value = ''): SpecRow => ({ id: rowSequence++, key, value })
-const IMAGE_PRESETS = ['processor', 'motherboard', 'ram', 'vga', 'storage', 'power', 'case', 'cpu-cooler', 'fan', 'monitor', 'keyboard', 'mouse'].map((name) => `/products/${name}.svg`)
-// Contoh URL gambar eksternal gratis (picsum.photos): seed yang sama selalu menghasilkan gambar yang sama.
-const IMAGE_URL_EXAMPLES = Array.from({ length: 12 }, (_, i) => `https://picsum.photos/seed/gk-${i + 1}/640/480`)
 
 export default function AdminProductForm({ categories, brands, product }: { categories: Option[]; brands: Option[]; product?: ProductFormValues }) {
   const router = useRouter()
@@ -122,8 +119,7 @@ export default function AdminProductForm({ categories, brands, product }: { cate
         <label className="admin-field">Stok<input value={stock} onChange={(event) => setStock(event.target.value.replace(/\D/g, ''))} inputMode="numeric" required /></label>
         <label className="admin-field">Status<select value={status} onChange={(event) => setStatus(event.target.value)}><option value="ACTIVE">Aktif (tampil di toko)</option><option value="INACTIVE">Nonaktif (disembunyikan)</option></select></label>
       </div>
-      <label className="admin-field">Gambar<input value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} list="image-presets" placeholder="/products/vga.svg" /><small>Path file di folder public (contoh /products/vga.svg) atau URL https dari domain yang diizinkan (picsum.photos). Kosongkan untuk memakai inisial kategori.</small></label>
-      <datalist id="image-presets">{[...IMAGE_PRESETS, ...IMAGE_URL_EXAMPLES].map((path) => <option key={path} value={path} />)}</datalist>
+      <label className="admin-field">URL gambar<input value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} placeholder="https://encrypted-tbn0.gstatic.com/images?…" /><small>Salin alamat gambar dari hasil Google Images. Host Google Images dan picsum.photos didukung; tautan eksternal dapat berubah sewaktu-waktu.</small></label>
       {imageUrl && <div className="admin-image-preview"><Image src={imageUrl} alt="Pratinjau gambar produk" width={240} height={160} unoptimized /></div>}
     </fieldset>
 

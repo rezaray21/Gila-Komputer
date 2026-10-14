@@ -26,7 +26,7 @@ export type ParsedProduct = {
 const MAX_INT = 2_000_000_000 // batas aman kolom INT MySQL (signed 32-bit)
 
 // Domain gambar eksternal yang diizinkan (harus sinkron dengan images.remotePatterns di next.config.ts).
-export const ALLOWED_IMAGE_HOSTS: readonly string[] = ['picsum.photos']
+export const ALLOWED_IMAGE_HOSTS: readonly string[] = ['picsum.photos', 'encrypted-tbn0.gstatic.com']
 
 function toInteger(value: unknown): number | null {
   const number = typeof value === 'string' && value.trim() !== '' ? Number(value) : value
@@ -58,7 +58,7 @@ export function parseProductInput(body: unknown): { data: ParsedProduct } | { er
   const status = text(input.status)
   if (!(PRODUCT_STATUSES as readonly string[]).includes(status)) return { error: 'Status produk tidak valid.' }
 
-  // Gambar boleh: (a) path lokal di folder public, atau (b) URL https dari domain yang diizinkan.
+  // Gambar boleh berupa path lokal atau URL https dari domain yang diizinkan.
   const imageUrl = text(input.imageUrl)
   if (imageUrl && imageUrl.length > 191) {
     return { error: 'Alamat gambar terlalu panjang (maks. 191 karakter).' }
@@ -75,7 +75,7 @@ export function parseProductInput(body: unknown): { data: ParsedProduct } | { er
     }
   } else if (imageUrl && (imageUrl.includes('..') || imageUrl.startsWith('//') || !/^\/[A-Za-z0-9/_.-]+$/.test(imageUrl))) {
     // Path lokal: diawali "/" tunggal, tanpa "..", tanpa "//" (protocol-relative).
-    return { error: 'Gambar harus path lokal (contoh /products/vga.svg) atau URL https dari domain yang diizinkan.' }
+    return { error: 'Gambar harus berupa path valid atau URL https dari domain yang diizinkan.' }
   }
 
   const specs: Record<string, string> = {}

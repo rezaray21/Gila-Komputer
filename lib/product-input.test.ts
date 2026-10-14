@@ -40,6 +40,7 @@ test('input buruk ditolak', () => {
   bad({ imageUrl: '/products/../../etc/passwd' })
   // URL https dari domain yang diizinkan harus lolos validasi.
   assert.ok('data' in parseProductInput({ ...valid, imageUrl: 'https://picsum.photos/seed/gk-1/640/480' }))
+  assert.ok('data' in parseProductInput({ ...valid, imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:sample' }))
   bad({ imageUrl: 'http://picsum.photos/seed/gk-1/640/480' }) // bukan https
   bad({ specs: { Socket: '' } })
   bad({ specs: ['a'] })
